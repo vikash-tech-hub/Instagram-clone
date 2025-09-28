@@ -87,3 +87,28 @@ export const logout=async(_,res)=>{
         
     }
 }
+export const getprofile =async(req,res)=>{
+    try {
+        const userId=req.params.id;
+        let user=await User.findById(userId)
+        return res.status(200).json({
+            user,
+            success:true
+        })
+    } catch (error) {
+        console.log(error);
+        
+    }
+}
+export const editProfile=async(req,res)=>{
+    try {
+        const userId=req.id
+        const {bio,gender}=req.body
+        const profilePicture=req.file
+        let cloudResponse
+        
+    } catch (error) {
+        console.log((error));
+        
+    }
+}

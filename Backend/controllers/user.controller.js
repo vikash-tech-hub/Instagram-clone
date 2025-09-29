@@ -1,6 +1,7 @@
 import User from "../models/usermodel.js"
 import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
+import getDatauri from "../utils/datauri.js"
 export const register=async(requestAnimationFrame,res)=>{
     try {
         const {username,email,password}=req.body
@@ -106,7 +107,28 @@ export const editProfile=async(req,res)=>{
         const {bio,gender}=req.body
         const profilePicture=req.file
         let cloudResponse
-        
+        if (profilePicture){
+            const file=getDatauri(profilePicture)
+            cloudResponse=await cloudinary.uploader.upload(fileUri)
+
+            
+        }
+        const user=await  User.findById(userId)
+        if (!user){
+            return res.status(404).json({
+                message:"user not found",
+                success:false
+            })
+        }
+        if (bio) user.bio=bio
+        if (gender) user.gender=gender
+        if (profilePicture) user.profilePicture=cloudResponse.secure_url
+        await user.save()
+        return res.status(200).json({
+            message:"profile updated successfully",
+            success:true,
+            user
+        })
     } catch (error) {
         console.log((error));
         

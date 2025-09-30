@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import connectDB from "./utils/db.js"
 import dotenv from "dotenv"
+import userRoute from "./routes/user.routes.js"
 const app = express()
 dotenv.config()
 
@@ -18,14 +19,9 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-// routes
-app.get("/", (_, res) => {
-  return res.status(200).json({
-    message: "I am coming from backend",
-    success: true
-  })
-})
 
+// routes
+app.use("/api/v1/user",userRoute)
 app.listen(PORT, () => {
   connectDB()
   console.log(`Server is running at ${PORT}`)

@@ -12,7 +12,7 @@ const userSchema=new mongoose.Schema({
     following:[{
         type:mongoose.Schema.Types.ObjectId,ref:'User'
     }],
-    post:[{type:mongoose.Schema.Types.ObjectId,ref:'Post'}],
+    posts:[{type:mongoose.Schema.Types.ObjectId,ref:'Post'}],
     bookmarks:[{type:mongoose.Schema.Types.ObjectId,ref:'Post'}]
 
 },{timestamps:true})

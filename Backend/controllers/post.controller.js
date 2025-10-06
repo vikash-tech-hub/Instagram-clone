@@ -56,10 +56,35 @@ export const getAllPost = async (req, res) => {
 }
 export const getUserPost = async (req, res) => {
     try {
-        
+        const authorId=req.id
+        const posts=await Post.find({author:authorId}).sort({createdAt:-1}).populate({path:'author',select:'username profilePicture'})
+        .populate({path:'comments',sort:{createdAt:-1},populate: { path: 'author', select: 'username', profilePicture } })
+        return res.status(200).json({
+            message:"User post",
+            posts,
+            success:true
+        })
     } catch (error) {
         console.log(error);
         
+        
+    }
+}
+export const likePost=async(req,res)=>{
+    try {
+        const likeKrneWalaUserId=req.id
+        const postId=req.params.id
+        const post=await Post.findById(postId)
+        if(!post){
+            return res.status(404).json({
+                message:"Post not found"
+            })
+        }
+        // like logic start
+        await post
+
+    } catch (error) {
+        console.log(error);
         
     }
 }

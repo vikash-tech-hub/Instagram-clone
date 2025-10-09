@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs"
 import jwt from "jsonwebtoken"
 import getDatauri from "../utils/datauri.js"
 import cloudinary from "cloudinary"
+import { Post } from "../models/postmodel.js"
 export const register = async (req, res) => {
     try {
         const { username, email, password } = req.body
@@ -62,12 +63,22 @@ export const login = async (req, res) => {
         }
 
         const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY, { expiresIn: '1d' });
+        const populatePost=await Promise.all(
+            user.posts.map(async(postId)=>{
+                const post=await Post.findById(postId)
+                if (post.author.equals(user._id)) {
+                    return post
 
+                }
+                return null
+            }   
+        )
+    )
         return res.cookie('token', token, {
             httpOnly: true,
             sameSite: 'strict',
             maxAge: 24 * 60 * 60 * 1000,
-            secure: process.env.NODE_ENV === "production"
+           
         }).json({
             message: "Welcome back",
             success: true,
@@ -79,7 +90,7 @@ export const login = async (req, res) => {
                 bio: user.bio,
                 followers: user.followers,
                 following: user.following,
-                posts: user.posts
+                posts: populatePost
             }
         });
 

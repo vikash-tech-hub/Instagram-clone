@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
+import { Link, useNavigate } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
 
 const Login = () => {
     const [input, setInput] = useState({
@@ -13,6 +15,7 @@ const Login = () => {
         password: ""
     })
     const [loading, setLoading] = useState(false)
+    const navigate=useNavigate()
     const changeEventHandler=(e)=>{
         setInput({...input,[e.target.name]:e.target.value})
     }
@@ -28,6 +31,7 @@ const Login = () => {
                 withCredentials:true
             })
             if(res.data.success){
+                navigate("/")
                 toast.success(res.data.message)
                 setInput({
                     email: "",
@@ -70,7 +74,18 @@ const Login = () => {
             onChange={changeEventHandler}
             className='focus-visible:ring-transparent my-1'/>
         </div>
-        <Button className='bg-blue-500 text-white font-semibold rounded-md mt-4 py-1'type='submit'>Login</Button>
+        {
+            loading?(
+                <Button>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin'/>
+                    please wait
+                </Button>
+            ):(
+                <Button className='bg-blue-500 text-white font-semibold rounded-md mt-4 py-1'type='submit'>Login</Button>
+            )
+        }
+        
+        <span className='text-center'>Does not have an account ?<Link to="/signup" className='text-blue-600'>Signup</Link></span>
       </form>
     </div>
   )

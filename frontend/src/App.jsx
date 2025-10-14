@@ -6,6 +6,7 @@ import Home from './component/Home'
 import Login from './component/Login'
 import Signup from './component/Signup'
 import MainLayout from './component/MainLayout'
+import Profile from './component/Profile'
 
 
 const approuter = createBrowserRouter([
@@ -15,6 +16,9 @@ const approuter = createBrowserRouter([
     children:[{
       path:"/",
       element:<Home/>
+    },{
+      path:"/profile",
+      element:<Profile/>
     },
     ]
   },

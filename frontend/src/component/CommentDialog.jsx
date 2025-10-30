@@ -2,10 +2,24 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogTrigger } from '@/components/ui/dialog'
 import { MoreHorizontal } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const CommentDialog = ({ open, setOpen }) => {
+  const[text,setText]=useState("")  
+  const changeEventHandler=(e)=>{
+    const inputText=e.target.value
+    if (inputText.trim()){
+      setText(inputText)
+    }else{
+      setText("")
+    }
+    
+  }
+  const sendMessageHandler=async()=>{
+    alert(text)
+  }
+
   return (
     <Dialog open={open}>
       <DialogContent
@@ -65,10 +79,12 @@ const CommentDialog = ({ open, setOpen }) => {
               <div className='flex items-center gap-2 '>
                 <input
                   type='text'
+                  onChange={changeEventHandler}
+                  value={text}
                   placeholder='Add a comment'
                   className='w-full outline-none border border-gray-300 p-2 rounded'
                 />
-                <button variant='outline'>
+                <button disabled={!text.trim()}onClick={sendMessageHandler} variant='outline'>
                send
               </button>
               </div>

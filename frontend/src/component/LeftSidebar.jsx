@@ -1,26 +1,17 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { setAuthUser } from '@/redux/authSlice'
+import store from '@/redux/store'
 import axios from 'axios'
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-const sidebarItems = [
-  { icon: <Home />, text: 'Home' },
-  { icon: <Search />, text: 'Search' },
-  { icon: <TrendingUp />, text: 'Explore' },
-  { icon: <MessageCircle />, text: 'Messsage' },
-  { icon: <Heart />, text: 'Notification' },
-  { icon: <PlusSquare />, text: 'Create' },
-  { icon: (
-   <Avatar>
-        <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-        <AvatarFallback>CN</AvatarFallback>
-      </Avatar>), text: 'Proile' },
-
-    { icon: <LogOut />, text: 'Logout' },
-
-]
+import Createpost from './Createpost'
 const LeftSidebar = () => {
+  const dispatch=useDispatch()
+  const {user}=useSelector(store=>store.auth)
+  const [open,setOpen]=useState(false)
   const navigate=useNavigate()
   const logoutHandler=async()=>{
     try {
@@ -29,6 +20,7 @@ const LeftSidebar = () => {
                 withCredentials:true
             })
             if(res.data.success){
+              dispatch(setAuthUser(null))
               navigate("/login")
               toast.success(res.data.success)
             }
@@ -38,11 +30,30 @@ const LeftSidebar = () => {
       
     }
   }
+
 const sidebarHandler=(textType)=>{
   if(textType=="Logout"){
     logoutHandler()
+  }else if(textType=="create"){
+    setOpen(true)
   }
 }
+const sidebarItems = [
+  { icon: <Home />, text: 'Home' },
+  { icon: <Search />, text: 'Search' },
+  { icon: <TrendingUp />, text: 'Explore' },
+  { icon: <MessageCircle />, text: 'Messsage' },
+  { icon: <Heart />, text: 'Notification' },
+  { icon: <PlusSquare />, text: 'Create' },
+  { icon: (
+   <Avatar>
+        <AvatarImage src={user?.profilepicture} alt="@shadcn" />
+        <AvatarFallback>CN</AvatarFallback>
+      </Avatar>), text: 'Proile' },
+
+    { icon: <LogOut />, text: 'Logout' },
+
+]
   return (
     <div className='fixed top-0 z-10 left-0 px-4 border-r border-gray-400 w-[16%] h-screen'>
       <div className='flex flex-col'>
@@ -62,6 +73,7 @@ const sidebarHandler=(textType)=>{
 }
    </div>
       </div>
+      <Createpost open={open} setOpen={setOpen}/>
   </div>
   )
 }

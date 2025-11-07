@@ -34,7 +34,7 @@ const LeftSidebar = () => {
 const sidebarHandler=(textType)=>{
   if(textType=="Logout"){
     logoutHandler()
-  }else if(textType=="create"){
+  }else if(textType=="Create"){
     setOpen(true)
   }
 }
@@ -42,14 +42,14 @@ const sidebarItems = [
   { icon: <Home />, text: 'Home' },
   { icon: <Search />, text: 'Search' },
   { icon: <TrendingUp />, text: 'Explore' },
-  { icon: <MessageCircle />, text: 'Messsage' },
+  { icon: <MessageCircle />, text: 'Message' },
   { icon: <Heart />, text: 'Notification' },
   { icon: <PlusSquare />, text: 'Create' },
   { icon: (
    <Avatar>
         <AvatarImage src={user?.profilepicture} alt="@shadcn" />
         <AvatarFallback>CN</AvatarFallback>
-      </Avatar>), text: 'Proile' },
+      </Avatar>), text: 'Profile' },
 
     { icon: <LogOut />, text: 'Logout' },
 

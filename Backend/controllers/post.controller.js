@@ -2,6 +2,7 @@ import sharp from "sharp";
 import { Post } from "../models/postmodel.js";
 import { User } from "../models/usermodel.js"
 import { Comment } from "../models/commentmodel.js";
+import cloudinary from "../utils/cloudinary.js"
 
 export const addNewPost = async (req, res) => {
     try {
@@ -43,18 +44,33 @@ export const addNewPost = async (req, res) => {
     }
 }
 export const getAllPost = async (req, res) => {
-    try {
-        const post = await Post.find().sort({ createdAt: -1 }).populate({ path: 'author', select: 'username', profilePicture })
-            .populate({ path: 'comments', sort: { createdAt: -1 }, populate: { path: 'author', select: 'username', profilePicture } })
-        return res.status(200).json({
-            message: "All post",
-            post,
-            success: true
-        })
-    } catch (error) {
+  try {
+    const post = await Post.find()
+      .sort({ createdAt: -1 })
+      .populate({
+        path: "author",
+        select: "username profilePicture"
+      })
+      .populate({
+        path: "comments",
+        sort: { createdAt: -1 },
+        populate: {
+          path: "author",
+          select: "username profilePicture"
+        }
+      });
 
-    }
-}
+    return res.status(200).json({
+      message: "All post",
+      post,
+      success: true
+    });
+
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const getUserPost = async (req, res) => {
     try {
         const authorId = req.id

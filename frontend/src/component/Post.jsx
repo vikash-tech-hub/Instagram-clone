@@ -7,7 +7,7 @@ import { FaRegHeart } from "react-icons/fa";
 import CommentDialog from './CommentDialog'
 
 
-const Post = () => {
+const Post = ({post}) => {
     const [text, setText] = useState('');
     const changeEventHandler=(e)=>{
         const inputText=e.target.value;
@@ -28,10 +28,10 @@ const Post = () => {
 
 
                     <Avatar>
-                        <AvatarImage src='' alt="post image" />
+                        <AvatarImage src={post?.author?.profilePicture} alt="post image" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
-                    <h1>username</h1>
+                    <h1>{post?.author?.username}</h1>
                 </div>
                 <Dialog >
                     <DialogTrigger asChild>
@@ -47,7 +47,7 @@ const Post = () => {
 
             </div>
             <img className='rounded-sm my-2 w-full aspect-square object-cover'
-                src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170"
+                src={post?.image}
                 alt="post image" />
 
             <div className=''>
@@ -64,10 +64,10 @@ const Post = () => {
 
                 
             </div>
-            <span className='font-medium block mb-2'>1k likes</span>
+            <span className='font-medium block mb-2'>{post.likes.length}</span>
             <p>
-                <span className='font-medium mr-2'>username</span>
-                caption
+                <span className='font-medium mr-2'>{post?.author?.username}</span>
+                {post?.caption}
             </p>
             <span onClick={()=>setOpen(true)} className='cursor-pointer text-sm text-gray-400'>view all comments</span>
             <CommentDialog open={open} setOpen={setOpen}/>

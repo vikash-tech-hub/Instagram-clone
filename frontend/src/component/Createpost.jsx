@@ -3,13 +3,17 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { readFileAsDataURL } from '@/lib/utils'
+import axios from 'axios'
+import { Loader2 } from 'lucide-react'
 import React, { useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 const Createpost = ({open,setOpen}) => {
   const imageRef=useRef()
   const [file,setFile]=useState("")
   const [caption,setCaption]=useState("")
   const [imagePreview,setImagePreview]=useState("")
+  const [loading,setLoading]=useState(false)
   const fileChangeHandler=async (e)=>{
     const file=e.target.files?.[0]
     if (file){
@@ -20,11 +24,28 @@ const Createpost = ({open,setOpen}) => {
     }
   }
   const createposthandler=async(e)=>{
-    e.preventDefault()
+const formData=new FormData();
+formData.append("caption",caption )
+if (imagePreview){
+  formData.append("image",file)
+}
     try {
-        
+      setLoading(true)
+      const res=await axios.post("http://localhost:8000/api/v1/post/addpost",formData,{
+        headers:{
+          "Content-Type":"multipart/form-data"
+        },
+        withCredentials:true
+      })
+        if (res.data.success){
+          toast.success(res.data.message)
+        }
     } catch (error) {
         // 6:09 tk
+        toast.error(error.response?.data?.message || "Something went wrong")
+    }
+    finally{
+      setLoading(false)
     }
 }
   return (
@@ -45,7 +66,7 @@ const Createpost = ({open,setOpen}) => {
                   <span className='text-gray-600 text-xs'>Bio here....</span>
                 </div>
             </div>
-            <Textarea className='focus-visible:ring-transparent border-none' placeholder="write a caption"/>
+            <Textarea value={caption} onChange={(e)=>setCaption(e.target.value)}className='focus-visible:ring-transparent border-none' placeholder="write a caption"/>
             {
               imagePreview &&(
                 <div className='w-full h-64 flex items-center justify-center'>
@@ -56,6 +77,18 @@ const Createpost = ({open,setOpen}) => {
             }
             <input ref={imageRef} type="file" className='hidden' onChange={fileChangeHandler} />
             <Button onClick={()=>imageRef.current.click()} className='w-fit mx-auto bg-[#0095F6] hover:bg-[#1672af]'>Select from computer</Button>
+            {
+              imagePreview &&(
+                loading ? (
+                  <Button>
+                    <Loader2 className='mr-2 h-4 w-4 animate-spin'/>
+                  </Button>
+                ):(
+                  <Button type='submit' onClick={createposthandler} className='w-full'>Post</Button>
+                )
+              )
+              
+            }
         </DialogContent>
     </Dialog>
   )

@@ -6,6 +6,7 @@ import React, { useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
+import { Loader2 } from 'lucide-react'
 
 const Signup = () => {
     const [input, setInput] = useState({

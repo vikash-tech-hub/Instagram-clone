@@ -3,9 +3,11 @@ import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogHeader } from '@/components/ui/dialog'
 import { Textarea } from '@/components/ui/textarea'
 import { readFileAsDataURL } from '@/lib/utils'
+import { setPosts } from '@/redux/postSlice'
 import axios from 'axios'
 import { Loader2 } from 'lucide-react'
 import React, { useRef, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { toast } from 'sonner'
 
 const Createpost = ({open,setOpen}) => {
@@ -14,6 +16,9 @@ const Createpost = ({open,setOpen}) => {
   const [caption,setCaption]=useState("")
   const [imagePreview,setImagePreview]=useState("")
   const [loading,setLoading]=useState(false)
+  const {user}=useSelector(store=>store.auth)
+  const {posts}=useSelector(store=>store.post)
+  const dispatch=useDispatch()
   const fileChangeHandler=async (e)=>{
     const file=e.target.files?.[0]
     if (file){
@@ -38,7 +43,9 @@ if (imagePreview){
         withCredentials:true
       })
         if (res.data.success){
+          dispatch(setPosts([res.data.post,...posts]))
           toast.success(res.data.message)
+          setOpen(false)
         }
     } catch (error) {
         // 6:09 tk
@@ -56,13 +63,13 @@ if (imagePreview){
             </DialogHeader>
             <div className='flex gap-3 items-center'>
               <Avatar>
-                <AvatarImage src='' alt='img'/>
+                <AvatarImage src='{user?.profilePicture}' alt='img'/>
                 <AvatarFallback>
                   CN
                 </AvatarFallback>
                 </Avatar>
                 <div >
-                  <h1 className='font-semibold text-xs'>Username</h1>
+                  <h1 className='font-semibold text-xs'>{user?.username}</h1>
                   <span className='text-gray-600 text-xs'>Bio here....</span>
                 </div>
             </div>

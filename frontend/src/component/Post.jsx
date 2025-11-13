@@ -3,10 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
 import React, { useState } from "react";
-import { FaRegHeart } from "react-icons/fa";
+import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import store from "@/redux/store";
+import { toast } from "sonner";
+import axios from "axios";
+import { setPosts } from "@/redux/postSlice";
 
 const Post = ({ post }) => {
   const [text, setText] = useState("");
@@ -20,6 +23,84 @@ const Post = ({ post }) => {
   };
   const [open, setOpen] = useState(false);
   const { user } = useSelector((store) => store.auth);
+  const {posts}=useSelector(store=>store.post)
+  const dispatch=useDispatch()
+  const [liked, setLiked] = useState(post?.likes?.includes(user?._id) || false);
+  const [postLikes, setPostLikes] = useState(post?.likes?.length || 0);
+  const [comment,setComment]=useState(post.comments)
+
+  const likeOrDislikeHandler = async (postId) => {
+    try {
+      const action = liked ? "dislike" : "like";
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/post/${postId}/${action}`,
+        { withCredentials: true }
+      );
+
+      if (res.data.success) {
+        const updatedLikes = liked ? postLikes - 1 : postLikes + 1;
+        setPostLikes(updatedLikes);
+        setLiked(!liked);
+
+        // apne post ki updat ekrna h 
+        const updatedPostData=posts.map(p=>p._id===postId?{
+          ...p,
+          likes:liked?p.likes.filter(id=>id!=user?._id):[...p.likes,user?._id]
+        }:p)
+        dispatch(setPosts(updatedPostData))
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error(error?.response?.data?.message || "Something went wrong");
+    }
+  };
+
+  const commentHandler=async()=>{
+    try {
+      const res=await axios.post(`http://localhost:8000/api/v1/post/${post._id}/comment`,{text},{
+        headers:{
+          "Content-Type":'application/json'
+        },
+        withCredentials:true
+      })
+      console.log(res.data)
+      if(res.data.success){
+        
+        const updatedCommetData=[...comment,res.data.message]
+        setComment(updatedCommetData)
+        const updatedPostdata=posts.map(p=>
+          p._id===post._id?{...p,comments:updatedCommetData}:p
+        )
+        dispatch(setPosts(updatedPostdata))
+        toast.success(res.data.success)
+        setText("")
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+
+
+ const deletePostHandler = async () => {
+  try {
+    const res = await axios.delete(
+      `http://localhost:8000/api/v1/post/delete/${post?._id}`,
+      { withCredentials: true } // ✅ fixed
+    );
+
+    if (res.data.success) {
+      const updatedPostData=posts.filter((postItem)=>postItem._id!=post?._id)
+      dispatch(setPosts(updatedPostData))
+      toast.success(res.data.message);
+    }
+  } catch (error) {
+    console.log(error);
+    toast.error(error?.response?.data?.message || "Something went wrong");
+  }
+};
+
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
       <div className="flex items-center justify-between">
@@ -45,7 +126,7 @@ const Post = ({ post }) => {
               Add to Favourite
             </Button>
             {user && user._id === post?.author?._id && (
-              <Button variant="ghost" className="cursor-pointer w-fit">
+              <Button onClick={deletePostHandler} variant="ghost" className="cursor-pointer w-fit">
                 Delete
               </Button>
             )}
@@ -61,10 +142,15 @@ const Post = ({ post }) => {
       <div className="">
         <div className="flex items-center justify-between my-2">
           <div className="flex items-center gap-3">
-            <FaRegHeart
+            {
+              liked?<FaHeart onClick={() => likeOrDislikeHandler(post._id)} size={'24'}  className="cursor-pointer text-red-400"/>: 
+              <FaRegHeart onClick={() => likeOrDislikeHandler(post._id)}
+
               size={"22px"}
               className="cursor-pointer hover:text-gray-600"
             />
+            }
+           
             <MessageCircle
               onClick={() => setOpen(true)}
               className="cursor-pointer hover:text-gray-600"
@@ -74,7 +160,7 @@ const Post = ({ post }) => {
           <Bookmark className="cursor-pointer hover:text-gray-600" />
         </div>
       </div>
-      <span className="font-medium block mb-2">{post.likes.length}</span>
+      <span className="font-medium block mb-2">{postLikes}</span>
       <p>
         <span className="font-medium mr-2">{post?.author?.username}</span>
         {post?.caption}
@@ -83,7 +169,7 @@ const Post = ({ post }) => {
         onClick={() => setOpen(true)}
         className="cursor-pointer text-sm text-gray-400"
       >
-        view all comments
+        view {comment.length} comments
       </span>
       <CommentDialog open={open} setOpen={setOpen} />
       <div className="flex items-center justify-between">
@@ -94,7 +180,7 @@ const Post = ({ post }) => {
           onChange={changeEventHandler}
           className="outline-none text-sm w-full"
         />
-        {text && <span className="text-[#3BADF8]">Post</span>}
+        {text && <span onClick={commentHandler} className="text-[#3BADF8] cursor-pointer">Post</span>}
       </div>
     </div>
   );

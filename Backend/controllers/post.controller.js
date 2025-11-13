@@ -91,6 +91,7 @@ export const likePost = async (req, res) => {
     try {
         const likeKrneWalaUserId = req.id
         const postId = req.params.id
+
         const post = await Post.findById(postId)
         if (!post) {
             return res.status(404).json({
@@ -142,6 +143,7 @@ export const dislikePost = async (req, res) => {
 export const addComment = async (req, res) => {
     try {
         const postId = req.params.id
+        
         const commentKarneWalaUserKiId = req.id
         const { text } = req.body
         const post = await Post.findById(postId)
@@ -156,7 +158,8 @@ export const addComment = async (req, res) => {
             author: commentKarneWalaUserKiId,
             post: postId
 
-        }).populate({
+        })
+        await comment.populate({
             path: 'author',
             select: 'username profilePicture'
         })
@@ -195,40 +198,47 @@ export const getCommentsOfPost = async (req, res) => {
 }
 export const deletePost = async (req, res) => {
     try {
-        const postId = req.params.id
-        const authorId = req.id
-        const post = await Post.findById(postId)
-        if (!post) {
-            return res.status(404).json({
-                message: "Post not found",
-                success: false
-            })
-        }
-        // chedck if the looged in user is the owner of the post
-        if (post.author.toString() !== authorId) {
-            return res.status(403).json({
-                message: "You are not authorized to delete this post",
-                success: false
-            })
-        }
-        // delete the post
-        await Post.findByIdAndDelete(postId)
-        // remove the post from the user's posts array
-        let user = await User.findById(authorId)
-        user.posts = User.posts.filter(id => id.toString() !== postId)
-        await user.save()
-        await comment.deleteMany({ post: postId })
-        return res.status(200).json({
-            message: "Post deleted successfully",
-            success: true
-        })
+    const postId = req.params.id;
+    const authorId = req.id;
 
-
-    } catch (error) {
-        console.log(error);
-
+    const post = await Post.findById(postId);
+    if (!post) {
+      return res.status(404).json({
+        message: "Post not found",
+        success: false,
+      });
     }
-}
+
+    if (post.author.toString() !== authorId) {
+      return res.status(403).json({
+        message: "You are not authorized to delete this post",
+        success: false,
+      });
+    }
+
+    await Post.findByIdAndDelete(postId);
+
+    const user = await User.findById(authorId);
+    if (user && Array.isArray(user.posts)) {
+      user.posts = user.posts.filter((id) => id.toString() !== postId);
+      await user.save();
+    }
+
+    await Comment.deleteMany({ post: postId });
+
+    return res.status(200).json({
+      message: "Post deleted successfully",
+      success: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Server error while deleting post",
+      success: false,
+    });
+  }
+};
+
 export const bookmarkPost = async (req, res) => {
     try {
         const postId = req.params.id

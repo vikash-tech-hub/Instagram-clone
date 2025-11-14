@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
 import Createpost from './Createpost'
+import { setPosts, setSelectedPost } from '@/redux/postSlice'
 const LeftSidebar = () => {
   const dispatch=useDispatch()
   const {user}=useSelector(store=>store.auth)
@@ -21,6 +22,8 @@ const LeftSidebar = () => {
             })
             if(res.data.success){
               dispatch(setAuthUser(null))
+              dispatch(setSelectedPost(null))
+              dispatch(setPosts(null))
               navigate("/login")
               toast.success(res.data.success)
             }

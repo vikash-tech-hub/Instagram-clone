@@ -163,7 +163,7 @@ export const getprofile = async (req, res) => {
   try {
     const userId = req.params.id;
 
-    let user = await User.findById(userId).select("-password");
+    let user = await User.findById(userId).populate({path:'posts',createdAt:-1}).populate('bookmarks');
 
     return res.status(200).json({
       user,
@@ -221,7 +221,7 @@ export const editProfile = async (req, res) => {
 export const getSuggestedUsers = async (req, res) => {
   try {
     const SuggestedUsers = await User.find({
-      _id: { $ne: req.id },
+      _id: { $ne: req.id},
     }).select("-password");
 
     if (!SuggestedUsers || SuggestedUsers.length === 0) {

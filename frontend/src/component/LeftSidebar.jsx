@@ -1,6 +1,5 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { setAuthUser } from '@/redux/authSlice'
-import store from '@/redux/store'
 import axios from 'axios'
 import { Heart, Home, LogOut, MessageCircle, PlusSquare, Search, TrendingUp } from 'lucide-react'
 import React, { useState } from 'react'
@@ -17,7 +16,7 @@ const LeftSidebar = () => {
   const logoutHandler=async()=>{
     try {
      const res=await axios.get("http://localhost:8000/api/v1/user/logout",{
-                
+
                 withCredentials:true
             })
             if(res.data.success){
@@ -30,7 +29,7 @@ const LeftSidebar = () => {
     } catch (error) {
       toast.error(error.res.data.message)
       console.log(error);
-      
+
     }
   }
 
@@ -43,6 +42,8 @@ const sidebarHandler=(textType)=>{
     navigate(`profile/${user?._id}`)
   }else if(textType=="Home"){
     navigate('/')
+  }else if(textType=="Message"){
+    navigate('/chat')
   }
 }
 const sidebarItems = [

@@ -3,6 +3,7 @@ import { Post } from "../models/postmodel.js";
 import { User } from "../models/usermodel.js"
 import { Comment } from "../models/commentmodel.js";
 import cloudinary from "../utils/cloudinary.js"
+import { getRecieverSocketId } from "../Socket/Socket.js";
 
 export const addNewPost = async (req, res) => {
     try {
@@ -103,6 +104,19 @@ export const likePost = async (req, res) => {
         await post.save()
 
         // implemet socket io
+        const user=await User.findById(likeKrneWalaUserId).select('username profilePicture')
+        const postownerid=post.author.toString()
+        if (postownerid!=likeKrneWalaUserId){
+            const notification={
+                type:'like',
+                userId:likeKrneWalaUserId,
+                userDetails:user,
+                postId,
+                message:"your post was liked"
+            }
+            const postOwnerSocketId=getRecieverSocketId(postownerid)
+            io.to(postOwnerSocketId).emit('notification',notification)
+        }
         return res.status(200).json({
             message: "Post liked",
             success: true
@@ -129,6 +143,19 @@ export const dislikePost = async (req, res) => {
         await post.save()
 
         // implemet socket io
+         const user=await User.findById(likeKrneWalaUserId).select('username profilePicture')
+        const postownerid=post.author.toString()
+        if (postownerid!=likeKrneWalaUserId){
+            const notification={
+                type:'dislike',
+                userId:likeKrneWalaUserId,
+                userDetails:user,
+                postId,
+                message:"your post was liked"
+            }
+            const postOwnerSocketId=getRecieverSocketId(postownerid)
+            io.to(postOwnerSocketId).emit('notification',notification)
+        }
         return res.status(200).json({
             message: "Post disliked",
             success: true

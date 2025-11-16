@@ -18,11 +18,11 @@ const EditProfile = () => {
 
     // FIXED: file only, and preview stored separately
     const [input, setInput] = useState({
-        profilePicture: null, 
+       
+        profilePicture: user?.profilePicture, 
         bio: user?.bio,
         gender: user?.gender
     });
-
     const [preview, setPreview] = useState(user?.profilePicture); // 🔥 live preview image
 
     const navigate = useNavigate();

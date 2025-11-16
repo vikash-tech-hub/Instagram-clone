@@ -185,13 +185,13 @@ export const editProfile = async (req, res) => {
 
     let cloudResponse;
 
+    // 👉 FIXED: Pass file.content instead of entire object
     if (profilePicture) {
-      const file = getDatauri(profilePicture);
-      cloudResponse = await cloudinary.uploader.upload(file);
+      const file = getDatauri(profilePicture); // returns { content: "data:image/png;base64..." }
+      cloudResponse = await cloudinary.uploader.upload(file.content);
     }
 
     const user = await User.findById(userId).select("-password");
-
     if (!user) {
       return res.status(404).json({
         message: "user not found",
@@ -201,7 +201,9 @@ export const editProfile = async (req, res) => {
 
     if (bio) user.bio = bio;
     if (gender) user.gender = gender;
-    if (profilePicture) user.profilePicture = cloudResponse.secure_url;
+
+    // 👉 FIXED: only update if cloudResponse exists
+    if (cloudResponse) user.profilePicture = cloudResponse.secure_url;
 
     await user.save();
 
@@ -210,10 +212,17 @@ export const editProfile = async (req, res) => {
       success: true,
       user,
     });
+
   } catch (error) {
     console.log(error);
+    return res.status(500).json({
+      message: "Internal server error",
+      success: false,
+      error: error.message,
+    });
   }
 };
+
 
 /* ===========================================
    SUGGESTED USERS

@@ -7,6 +7,7 @@ import Signup from "./component/Signup";
 import MainLayout from "./component/MainLayout";
 import Profile from "./component/Profile";
 import EditProfile from "./component/EditProfile";
+import ChatPage from "./component/ChatPage";
 
 const approuter = createBrowserRouter([
   {
@@ -25,6 +26,11 @@ const approuter = createBrowserRouter([
         path: "/account/edit",
         element: <EditProfile />,
       },
+      {
+              path: "/chat",
+              element: <ChatPage />,
+       },
+
     ],
   },
   {

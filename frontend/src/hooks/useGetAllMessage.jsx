@@ -10,7 +10,7 @@ const useGetAllMessage = () => {
     useEffect(() => {
         const fetchSuggestedUsers = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/v1/message/all/${selectedUser?._id}`, { withCredentials: true });
+                const res = await axios.get(`https://instagram-clone-1-xltx.onrender.com/api/v1/message/all/${selectedUser?._id}`, { withCredentials: true });
                 if (res.data.success) { 
                     console.log(res.data.messages)
                     dispatch(setMessages(res.data.messages));

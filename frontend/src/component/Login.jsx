@@ -2,12 +2,12 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from "@/components/ui/button"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import { toast } from 'sonner'
 import { Link, useNavigate } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setAuthUser } from '@/redux/authSlice'
 
 const Login = () => {
@@ -17,6 +17,7 @@ const Login = () => {
         password: ""
     })
     const [loading, setLoading] = useState(false)
+    const {user}=useSelector(store=>store.auth)
     const navigate=useNavigate()
     const changeEventHandler=(e)=>{
         setInput({...input,[e.target.name]:e.target.value})
@@ -52,6 +53,11 @@ const Login = () => {
             setLoading(false)
         }
     }
+    useEffect(()=>{
+        if(user){
+            navigate("/")
+        }
+    })
   return (
     <div className='flex items-center w-screen h-screen justify-center'>
       <form onSubmit={signupHandler} className='shadow-lg flex flex-col gap-5 p-8'>

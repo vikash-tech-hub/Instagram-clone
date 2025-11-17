@@ -11,6 +11,7 @@ import { io } from "socket.io-client";
 import { useDispatch, useSelector } from "react-redux";
 import { setOnlineUsers } from "./redux/chatSlice";
 import { setSocket } from "./redux/socketSlice";
+import { setLikeNotification } from "./redux/rtmSlice";
 
 const approuter = createBrowserRouter([
   {
@@ -50,6 +51,9 @@ function App() {
       dispatch(setOnlineUsers(onlineUsers));
     });
 
+    socketio.on('notification',(notification)=>{
+      dispatch(setLikeNotification(notification))
+    })
     return () => {
       socketio.disconnect();
       dispatch(setSocket(null));

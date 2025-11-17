@@ -2,7 +2,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Bookmark, MessageCircle, MoreHorizontal, Send } from "lucide-react";
-import React, {  useState } from "react";
+import React, { useState } from "react";
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import CommentDialog from "./CommentDialog";
 import { useDispatch, useSelector } from "react-redux";
@@ -109,6 +109,19 @@ const Post = ({ post }) => {
       toast.error(error?.response?.data?.message || "Something went wrong");
     }
   };
+  const bookMarkHandler = async () => {
+    try {
+      const res = await axios.get(
+        `http://localhost:8000/api/v1/post/${post?._id}/bookmark`,
+        { withCredentials: true }
+      );
+      if (res.data.success) {
+        toast.success(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <div className="my-8 w-full max-w-sm mx-auto">
@@ -119,23 +132,27 @@ const Post = ({ post }) => {
             <AvatarFallback>CN</AvatarFallback>
           </Avatar>
           <div className="flex items-center gap-3">
-             <h1>{post?.author?.username}</h1>
-             
-            {user?._id===post.author._id  && <Badge variant='secondary'>author</Badge>} 
+            <h1>{post?.author?.username}</h1>
+
+            {user?._id === post.author._id && (
+              <Badge variant="secondary">author</Badge>
+            )}
           </div>
-         
         </div>
         <Dialog>
           <DialogTrigger asChild>
             <MoreHorizontal className="cursor-pointer" />
           </DialogTrigger>
           <DialogContent className="flex flex-col items-center text-sm text-center">
-            <Button
-              variant="ghost"
-              className="cursor-pointer w-fit text-[#ed4956] font-bold"
-            >
-              Unfollow
-            </Button>
+            {post?.author?._id !== user?._id && (
+              <Button
+                variant="ghost"
+                className="cursor-pointer w-fit text-[#ed4956] font-bold"
+              >
+                Unfollow
+              </Button>
+            )}
+
             <Button variant="ghost" className="cursor-pointer w-fit ">
               Add to Favourite
             </Button>
@@ -183,7 +200,10 @@ const Post = ({ post }) => {
             />
             <Send className="cursor-pointer hover:text-gray-600" />
           </div>
-          <Bookmark className="cursor-pointer hover:text-gray-600" />
+          <Bookmark
+            onClick={bookMarkHandler}
+            className="cursor-pointer hover:text-gray-600"
+          />
         </div>
       </div>
       <span className="font-medium block mb-2">{postLikes}</span>
@@ -191,18 +211,18 @@ const Post = ({ post }) => {
         <span className="font-medium mr-2">{post?.author?.username}</span>
         {post?.caption}
       </p>
-      {
-        comment.length>0&&<span
-        onClick={() => {
-          dispatch(setSelectedPost(post));
-          setOpen(true);
-        }}
-        className="cursor-pointer text-sm text-gray-400"
-      >
-        view {comment.length} comments
-      </span>
-      }
-      
+      {comment.length > 0 && (
+        <span
+          onClick={() => {
+            dispatch(setSelectedPost(post));
+            setOpen(true);
+          }}
+          className="cursor-pointer text-sm text-gray-400"
+        >
+          view {comment.length} comments
+        </span>
+      )}
+
       <CommentDialog open={open} setOpen={setOpen} />
       <div className="flex items-center justify-between">
         <input

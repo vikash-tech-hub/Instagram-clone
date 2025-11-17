@@ -3,7 +3,7 @@ import { Post } from "../models/postmodel.js";
 import { User } from "../models/usermodel.js"
 import { Comment } from "../models/commentmodel.js";
 import cloudinary from "../utils/cloudinary.js"
-import { getRecieverSocketId } from "../Socket/Socket.js";
+import { getRecieverSocketId,io } from "../Socket/Socket.js";
 
 export const addNewPost = async (req, res) => {
     try {
@@ -265,38 +265,45 @@ export const deletePost = async (req, res) => {
     });
   }
 };
-
 export const bookmarkPost = async (req, res) => {
     try {
-        const postId = req.params.id
-        const authorId = req.id
-        const post = await Post.findById(postId)
+        const postId = req.params.id;
+        const authorId = req.id;
+
+        const post = await Post.findById(postId);
         if (!post) {
             return res.status(404).json({
                 message: "Post not found",
                 success: false
-            })
+            });
         }
-        const user = await User.findById(authorId)
-        if (user.bookmarks.includes(post._Id)) {
-            await user.updateOne({ $pull: { bookmarks: post._id } })
-            await user.save()
+
+        const user = await User.findById(authorId);
+
+        const postIdString = post._id.toString();
+
+        if (user.bookmarks.includes(postIdString)) {
+            await user.updateOne({ $pull: { bookmarks: post._id } });
+            await user.save();
             return res.status(200).json({
-                type: 'unsave',
+                type: "unsave",
                 message: "Post removed from bookmarks",
                 success: true
-            })
+            });
         } else {
-            await user.updateOne({ $addToSet: { bookmarks: post._id } })
-            await user.save()
+            await user.updateOne({ $addToSet: { bookmarks: post._id } });
+            await user.save();
             return res.status(200).json({
-                type: 'saved',
-                message: "Post  bookmarked",
+                type: "save",
+                message: "Post bookmarked",
                 success: true
-            })
+            });
         }
     } catch (error) {
         console.log(error);
-
+        return res.status(500).json({
+            message: "Server error",
+            success: false
+        });
     }
-}
+};

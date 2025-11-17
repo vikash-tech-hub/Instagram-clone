@@ -1,7 +1,7 @@
 import React from 'react'
 import Feed from './Feed'
 import { Outlet } from 'react-router-dom'
-import useGetAllPost from '@/hooks/useGetAllPost'   // FIXED
+import useGetAllPost from "@/hooks/useGetAllPost.jsx";
 import Rightsidebar from './Rightsidebar'
 import useGetSuggestedUsers from '@/hooks/UseGetSuggestedUser'
 

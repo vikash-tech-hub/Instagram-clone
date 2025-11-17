@@ -1,9 +1,10 @@
 import React from 'react'
 import Feed from './Feed'
 import { Outlet } from 'react-router-dom'
-import useGetAllPost from "@/hooks/useGetAllPost.jsx";
+// import useGetAllPost from "@/hooks/useGetAllPost.jsx";
 import Rightsidebar from './Rightsidebar'
 import useGetSuggestedUsers from '@/hooks/UseGetSuggestedUser'
+import useGetAllPost from '@/hooks/useGetallpost'
 
 const Home = () => {
   useGetAllPost();   // runs once on page load
